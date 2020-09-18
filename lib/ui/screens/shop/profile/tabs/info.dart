@@ -7,38 +7,33 @@ import 'package:url_launcher/url_launcher.dart';
 
 class InfoTab extends StatelessWidget {
   final GlobalKey widgetKey = GlobalKey();
-  final ValueChanged<double> notify;
 
-  InfoTab({Key key, @required this.notify}) : super(key: key);
+  InfoTab({Key key, this.scrollPhysics}) : super(key: key);
+  ScrollPhysics scrollPhysics;
 
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((d) {
       var mContext = widgetKey.currentContext;
       print('Tamaño en Informacion' + mContext?.size.toString());
-      if (mContext != null) {
-        notify(mContext.size.height);
-      }
+      // if (mContext != null) {}
     });
 
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Container(
-        key: widgetKey,
-        padding: EdgeInsets.symmetric(
-          horizontal: 25,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            _sectionDataShop(context),
-            SizedBox(height: 20),
-            _sectionDeliveryTypes(context),
-            SizedBox(height: 20),
-            _sectionPayments(),
-            SizedBox(height: 20),
-          ],
-        ),
+    return Container(
+      key: widgetKey,
+      padding: EdgeInsets.symmetric(
+        horizontal: 25,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          _sectionDataShop(context),
+          SizedBox(height: 20),
+          _sectionDeliveryTypes(context),
+          SizedBox(height: 20),
+          _sectionPayments(),
+          SizedBox(height: 20),
+        ],
       ),
     );
   }

@@ -3,11 +3,16 @@ import 'package:onlineshop/ui/screens/shop/profile/tabs/comments.dart';
 import 'package:onlineshop/ui/screens/shop/profile/tabs/info.dart';
 import 'package:onlineshop/ui/screens/shop/profile/tabs/menu.dart';
 import 'package:onlineshop/ui/widgets/local_info.dart';
+import 'package:rubber/rubber.dart';
 
 class ShopProfileContent extends StatefulWidget {
-  ShopProfileContent({Key key, @required this.scrollController})
-      : super(key: key);
+  ShopProfileContent({
+    Key key,
+    @required this.scrollController,
+    @required this.rubberAnimationController,
+  }) : super(key: key);
   final ScrollController scrollController;
+  final RubberAnimationController rubberAnimationController;
 
   @override
   _ShopProfileContentState createState() => _ShopProfileContentState();
@@ -16,8 +21,7 @@ class ShopProfileContent extends StatefulWidget {
 class _ShopProfileContentState extends State<ShopProfileContent>
     with SingleTickerProviderStateMixin {
   TabController _tabController;
-
-  double currentHeight, heightMenu, heightComments, heightInfo;
+  ScrollPhysics scrollPhysics;
 
   @override
   void initState() {
@@ -25,50 +29,41 @@ class _ShopProfileContentState extends State<ShopProfileContent>
     _tabController = new TabController(vsync: this, length: 3);
 
     _tabController.addListener(() {
-      print('Tab Controller');
       print(_tabController.index);
-      calculateHeightContent();
     });
 
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      print('[WidgetsBinding]');
-      calculateHeightContent();
+    widget.rubberAnimationController.animationState.addListener(() {
+      // if (widget.rubberAnimationController.animationState.value ==
+      //     AnimationState.collapsed) {
+      //   setState(() {
+      //     scrollPhysics = NeverScrollableScrollPhysics();
+      //   });
+      //   return;
+      // }
+      if (widget.rubberAnimationController.animationState.value ==
+          AnimationState.expanded) {
+        setState(() {
+          scrollPhysics = AlwaysScrollableScrollPhysics();
+        });
+
+        return;
+      }
     });
 
+    // widget.scrollController.addListener(() {
+    //   if (widget.scrollController.offset >=
+    //           widget.scrollController.position.maxScrollExtent &&
+    //       !widget.scrollController.position.outOfRange) {
+    //     print("🤬🤬🤬🤬🤬 reach the bottom");
+    //     setState(() {
+    //       scrollPhysics = AlwaysScrollableScrollPhysics();
+    //     });
+    //   }
+    // });
 
-  }
-
-  void calculateHeightContent() {
-    double contextHeight = MediaQuery.of(context).size.height;
-    print('heightMenu $currentHeight');
-    print('index -> ' + _tabController?.index.toString());
-    print('heightMenu $heightMenu');
-    print('heightMenu $heightComments');
-    print('heightMenu $heightInfo');
-
-    if (_tabController.index == 0 && heightMenu != null) {
-      setState(() {
-        currentHeight = heightMenu + 310;
-      });
-      return;
-    }
-    if (_tabController.index == 1 && heightComments != null) {
-      setState(() {
-        currentHeight = heightComments + 310;
-      });
-      return;
-    }
-    if (_tabController.index == 2 && heightInfo != null) {
-      setState(() {
-        currentHeight = heightInfo + 310;
-      });
-      return;
-    }
-
-    setState(() {
-      currentHeight = contextHeight * 1.5;
-    });
-    return;
+    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    //   print('[WidgetsBinding]');
+    // });
   }
 
   @override
@@ -99,35 +94,25 @@ class _ShopProfileContentState extends State<ShopProfileContent>
                   child: Container(
                     width: double.infinity,
                     //TODO : Recognize the height of each tab
-                    height:
-                        currentHeight ?? MediaQuery.of(context).size.height * 2,
+                    height: MediaQuery.of(context).size.height * 2,
                     // color: Colors.purpleAccent.withOpacity(0.2),
                     child: TabBarView(
                       controller: _tabController,
                       children: [
                         MenuTab(
-                          notify: (val) {
-                            print('Valor que en MENUTAB es ' + val.toString());
-
-                            heightMenu = val;
-                            // calculateHeightContent();
+                          scrollPhysics: scrollPhysics,
+                          onReachTop: () {
+                            // setState(() {
+                            //   scrollPhysics = NeverScrollableScrollPhysics();
+                            // });
+                            // widget.rubberAnimationController.collapse();
                           },
                         ),
                         CommentsTab(
-                          notify: (val) {
-                            print('Valor que viene CommentsTab es ' +
-                                val.toString());
-
-                            heightComments = val;
-                          },
+                          scrollPhysics: scrollPhysics,
                         ),
                         InfoTab(
-                          notify: (val) {
-                            print(
-                                'Valor que viene InfoTab es ' + val.toString());
-
-                            heightInfo = val;
-                          },
+                          scrollPhysics: scrollPhysics,
                         ),
                       ],
                     ),

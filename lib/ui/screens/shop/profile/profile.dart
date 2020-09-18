@@ -21,13 +21,13 @@ class ShopProfileScreen extends StatefulWidget {
 
 class _ShopProfileScreenState extends State<ShopProfileScreen>
     with SingleTickerProviderStateMixin {
-  RubberAnimationController _controller;
+  RubberAnimationController _rubberAnimationController;
 
   ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
-    _controller = RubberAnimationController(
+    _rubberAnimationController = RubberAnimationController(
       vsync: this,
       upperBoundValue: AnimationControllerValue(percentage: 1),
       lowerBoundValue: AnimationControllerValue(percentage: 0.65),
@@ -35,6 +35,9 @@ class _ShopProfileScreenState extends State<ShopProfileScreen>
       initialValue: 0.65,
     );
 
+    // _rubberAnimationController.addStatusListener((status) {
+    //   print(status);
+    // });
     super.initState();
   }
 
@@ -60,9 +63,10 @@ class _ShopProfileScreenState extends State<ShopProfileScreen>
             lowerLayer: _getSliderLayer(),
             upperLayer: ShopProfileContent(
               scrollController: _scrollController,
+              rubberAnimationController: _rubberAnimationController,
             ),
             dragFriction: 0,
-            animationController: _controller,
+            animationController: _rubberAnimationController,
           ),
         ));
   }
